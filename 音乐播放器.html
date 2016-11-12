@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>音乐播放器</title>
+	<style>
+		*{
+			margin: 0px;
+			padding: 0px;
+
+		}
+
+		#music {
+			left: 50px;
+			top: 50px;
+			border-radius: 20px;
+			position: absolute;
+			background-color: #bbb;
+			box-shadow: 0px 0px 15px 11px #aaa inset;
+		}
+	
+		
+		.btn{
+			border-radius: 8px;
+			float: left;
+			margin: 20px;
+			background-color: #4dd;
+			width: 100px;
+			height: 30px;
+			text-align: center;
+			line-height: 30px;
+			font-weight: bold;
+			cursor: pointer;
+			color: #fff;
+			box-shadow: 0px 0px 7px 4px #4ed inset,2px 2px 5px 5px #aaa;
+			text-shadow: 0 0.5px 0.5px #000;
+		}
+
+		#play-status{
+			box-shadow: 2px 2px 5px 5px #aaa ;
+			border-radius: 8px;
+			margin: 20px;
+			border: 2px solid #4ed;
+			width: 380px;
+			height: 30px;	
+			line-height: 30px;
+			color: #4ed;
+
+		}
+
+		#start, #end{
+			text-shadow: 0 0.5px 0.5px #000;
+			display: inline-block;
+			width: 50px;
+			height: 30px;
+			text-align: center;
+
+		}
+
+
+		#start {
+			float: left;
+		}
+
+		#end {
+			float: right;
+		}
+
+
+		.status{
+			display: inline-block;
+			position: relative;
+			text-align: center;
+			width: 280px;
+			height: 30px;
+
+
+		}
+
+		.bg-line {
+			position: absolute;
+			display: block;
+			margin:14px 0px;
+			width: 280px;
+			height: 3px;
+			background-color: #fff;
+
+		}
+
+
+		#active-circle{
+			box-shadow: 0px 0px 2px 2px #999;
+			border-radius: 50%;
+			position: absolute;
+			left: 0px;
+			top: 11px;
+			width: 10px;
+			height: 10px;
+			background-color: #4ed;
+		}
+
+
+		#music-name{
+
+			position: absolute;
+			height: 30px;
+			width: 200px;
+			color: #4ed;
+			margin: 0px 20px;
+			margin-top: -15px;
+			line-height: 30px;
+			text-shadow: 0 0.5px 0.5px #000;
+		}
+
+
+
+
+
+
+	</style>
+
+
+</head>
+<body>
+
+	<div id = "music">
+		<div id="play-status">
+			<div id="start">0:0</div>
+			<div class="status">
+				<span class="bg-line"></span>
+				<span id="active-circle"></span>
+			</div>
+			<div id="end"></div>
+		</div>
+		<div id="music-name"></div>
+		<div id="prev-btn" class="btn">上一首</div>
+		<div id="pause-btn" class="btn">暂停</div>
+		<div id="next-btn" class="btn">下一首</div>
+	</div>
+
+
+
+
+
+
+	
+
+
+
+	<script>
+
+		// 把歌名放这
+		var playList = [
+			"斑马斑马.mp3",
+			
+		];
+
+
+
+		var len = playList.length;
+		var index = 0;
+
+
+		var audio = new Audio();
+
+
+		var pauseBtn = document.getElementById('pause-btn');
+		var prevBtn = document.getElementById('prev-btn');
+		var nextBtn = document.getElementById('next-btn');
+
+		var end = document.getElementById('end');
+
+		var musicName = document.getElementById('music-name');
+
+
+		function initSong (index) {
+			audio.src = playList[index];
+			audio.load();
+
+			musicName.innerText = playList[index];  
+
+			audio.addEventListener('loadedmetadata',function(){
+				audio.play();
+				var duration = audio.duration;
+				end.innerText = renderTime(Math.round(duration));
+
+				initStatus();
+
+			},false)
+
+			audio.addEventListener('ended', function () {
+				nextBtn.click();
+			},false)
+		}
+
+
+		var start = document.getElementById('start');
+		var circle = document.getElementById('active-circle');
+
+		var timer;
+
+
+		function initStatus () {
+			clearInterval(timer);
+
+			circle.style.left = '0';
+
+			var duration = audio.duration;
+
+			timer = setInterval(function(){
+				var curTime = audio.currentTime,
+					left = Math.ceil(curTime/duration*280);
+				circle.style.left = left + 'px';	
+				start.innerText = renderTime(curTime);
+			},1000)
+		}
+
+		function renderTime (duration) {
+			var h = Math.floor(duration/3600),
+				m = Math.floor((duration - h * 3600 )/60),
+				s = Math.floor(duration - h * 3600 - m * 60);
+
+			return m + ':' + s ;
+		}
+
+
+
+
+
+		pauseBtn.addEventListener('click',function () {
+			if (audio.paused) {
+				audio.play();
+				pauseBtn.innerText = '暂停';
+			}else{
+				audio.pause();
+				pauseBtn.innerText = '播放';
+			};
+		},false)
+
+
+		nextBtn.addEventListener('click',function(){
+			pauseBtn.innerText = '暂停';
+
+			if (index === len - 1) {
+				index = 0;
+			}else{
+				++index;
+			}
+			initSong(index);
+		},false)
+
+
+		prevBtn.addEventListener('click',function(){
+			pauseBtn.innerText = '暂停';
+			if (index === 0) {
+				index = len - 1;
+			}else{
+				--index;
+			}
+			initSong(index);
+		},false)
+
+
+
+		initSong(index);
+
+
+	</script>
+
+
+
+
+
+	
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
